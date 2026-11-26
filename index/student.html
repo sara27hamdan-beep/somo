@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>اختبار: رسائل النبي ﷺ</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root{--burgundy:#6b1420;--brown:#3b2416;--gold:#d4af37;--gold-light:#f0d98c;--cream:#f5e9d7;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Cairo',sans-serif; background:linear-gradient(135deg,#2b1710 0%,#3b2416 40%,#4a0c16 100%); min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 14px;color:var(--cream);overflow-x:hidden;}
+  .card{position:relative;width:100%;max-width:850px; background:linear-gradient(160deg,rgba(59,36,22,.97),rgba(43,23,16,.98)); border:1px solid rgba(212,175,55,.35);border-radius:28px; padding:34px 30px;}
+  .screen{display:none;flex-direction:column;align-items:center;text-align:center;width:100%;}
+  .screen.active{display:flex;}
+  .badge{display:inline-block;font-size:.8rem;color:var(--brown); background:var(--gold);padding:5px 16px;border-radius:50px;font-weight:800;margin-bottom:12px;}
+  h1{font-family:'Amiri',serif;font-size:clamp(1.3rem,3.6vw,1.9rem);color:var(--gold-light);margin-bottom:20px;}
+  
+  .input-group{width:100%;max-width:400px;margin-bottom:15px;text-align:right;}
+  .input-group label{display:block;font-size:0.9rem;margin-bottom:5px;color:var(--gold);font-weight:600;}
+  .input-group input{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(212,175,55,.4);background:rgba(0,0,0,0.3);color:var(--cream);font-family:'Cairo';font-size:1rem;outline:none;}
+  
+  .start-btn{background:linear-gradient(135deg,var(--gold-light),var(--gold));color:var(--brown);font-weight:800;font-size:1rem;padding:14px 40px;border:none;border-radius:14px;cursor:pointer;margin-top:15px;font-family:'Cairo';}
+  
+  .chars-grid {display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; max-width: 500px; margin: 15px auto; padding: 15px; background: rgba(0,0,0,0.2); border-radius: 15px;}
+  .char-opt {background: transparent;border: 2px solid transparent;border-radius: 12px;cursor: pointer;display: flex;justify-content: center;align-items: center;aspect-ratio: 1 / 1;padding: 5px;}
+  .char-opt img {width: 100%;height: 100%;object-fit: contain;}
+  .char-opt.selected {border-color: var(--gold);background: rgba(212,175,55,0.2);}
+  
+  .quiz-header{display:flex;align-items:center;justify-content:center;gap:15px;margin-bottom:20px;width:100%;background:rgba(0,0,0,0.2);padding:10px 20px;border-radius:15px;}
+  .quiz-header img{width:60px;height:60px;object-fit:contain;}
+  .progress-info{display:flex;justify-content:center;gap:10px;margin-bottom:15px;font-size:.82rem;}
+  .chip{background:rgba(107,20,32,.6);padding:4px 14px;border-radius:50px;}
+  
+  .question-box{background:rgba(107,20,32,.55);border-radius:20px;padding:24px 22px;margin-bottom:22px;width:100%;text-align:right; position: relative;}
+  .qnum{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:12px;margin-left:10px;background:var(--gold);color:var(--brown);font-weight:800;}
+  .qtext{font-size:1.1rem;font-weight:600;line-height:1.9;}
+  
+  .options{display:flex;flex-direction:column;gap:12px;width:100%;}
+  .opt{position: relative; display:flex;align-items:center;gap:14px;width:100%;text-align:right;cursor:pointer;background:linear-gradient(140deg,rgba(90,58,36,.55),rgba(59,36,22,.75));border:1px solid rgba(212,175,55,.22);border-radius:16px;padding:15px 18px;color:var(--cream);font-family:'Cairo';font-size:1rem;font-weight:600; transition: 0.3s;}
+  .opt:hover:not(:disabled){transform:translateX(-6px); border-color:var(--gold);}
+  .opt .letter{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:rgba(212,175,55,.15);color:var(--gold-light);font-weight:800; z-index: 2;}
+  
+  .opt.correct{background:rgba(31,94,58,.9)!important;border-color:#3fb56f!important;}
+  .opt.correct .letter{background:#3fb56f;color:#fff;}
+  .opt.wrong{background:rgba(120,25,40,.9)!important;border-color:#d04a5e!important;}
+  .opt.wrong .letter{background:#d04a5e;color:#fff;}
+  
+  .effects-layer{position:fixed;inset:0;pointer-events:none;z-index:9999; overflow: hidden;}
+  .effect-item{position:absolute;top:-40px;font-size:28px;animation:fall linear forwards;}
+  @keyframes fall{0%{transform:translateY(0) rotate(0deg);opacity:1;}100%{transform:translateY(110vh) rotate(720deg);opacity:0;}}
+  
+  .score{text-align:center;margin-top:18px;font-size:.9rem;}
+  .profile-result img{width:150px;height:150px;object-fit:contain;margin-bottom:10px;}
+  .result-names{font-size:1.2rem;color:var(--gold);margin-bottom:15px;font-weight:700;}
+  .score-big{font-size:3.5rem;font-weight:800;color:#7ee2a8;margin-bottom:20px;}
+</style>
+</head>
+<body>
+
+<div class="effects-layer" id="effectsLayer"></div>
+
+<div class="card" id="card">
+  <div class="screen active" id="nameScreen">
+    <span class="badge">✦ البداية ✦</span>
+    <h1>أدخلوا الاسم الثنائي</h1>
+    
+    <div class="input-group">
+      <label>الاسم الثنائي:</label>
+      <!-- تم حذف كلمة مثال وجعل الخانة فارغة -->
+      <input type="text" id="pairName" placeholder="" autocomplete="off">
+    </div>
+    
+    <button type="button" class="start-btn" id="toCharBtn">التالي: اختيار الشخصية ⬅</button>
+  </div>
+
+  <div class="screen" id="charScreen">
+    <span class="badge">✦ اختيار الشخصية ✦</span>
+    <h1>اختاروا شخصيتكم المفضلة</h1>
+    <div class="chars-grid" id="charsGrid"></div>
+    <button type="button" class="start-btn" id="startQuizBtn" style="opacity:0.5; pointer-events:none;">ابدأ الاختبار 🚀</button>
+  </div>
+
+  <div class="screen" id="quizScreen">
+    <div class="quiz-header"><img id="headerImg" src=""><div class="names" id="headerNames"></div></div>
+    <div class="progress-info"><span class="chip" id="qType">—</span><span class="chip" id="qProgress"></span></div>
+    <div class="question-box"><span class="qnum" id="qNum">1</span><span class="qtext" id="qText"></span></div>
+    <div class="options" id="options"></div>
+    <div class="score">صحيح: <b id="correctCount">0</b> | المحاولات: <b id="totalCount">0</b></div>
+  </div>
+
+  <div class="screen" id="resultScreen">
+    <span class="badge">✦ النتيجة النهائية ✦</span>
+    <div class="profile-result"><img id="resultImg" src=""></div>
+    <div class="result-names" id="resultNames"></div>
+    <div class="score-big" id="finalScore"></div>
+    <button type="button" class="start-btn" onclick="location.reload()" style="margin-top:20px;">إعادة الاختبار 🔄</button>
+  </div>
+</div>
+
+<script>
+const BANK = [
+  {q:"وجّه النبي ﷺ رسائله إلى الملوك والزعماء بعد:", o:["غزوة بدر","صلح الحديبية","فتح مكة","غزوة تبوك"], a:1},
+  {q:"الصحابي الذي أُرسل إلى ملك البحرين هو:", o:["عمرو بن العاص","العلاء بن الحضرمي","دحية الكلبي","حاطب بن أبي بلتعة"], a:1},
+  {q:"ملك البحرين الذي وصلته الرسالة هو:", o:["المنذر بن ساوى","جيفر","باذان","الأصحم"], a:0},
+  {q:"الصحابي الذي أُرسل إلى ملكي عُمان هو:", o:["العلاء بن الحضرمي","عمرو بن العاص","عمرو الضمري","الحارث بن عمير"], a:1},
+  {q:"ملكا عُمان هما:", o:["المنذر وباذان","جيفر وعبد ابنا الجلندي","كسرى وهرقل","النجاشي والمقوقس"], a:1},
+  {q:"الاسم العلم للنجاشي هو:", o:["الأصحم","المنذر","باذان","شرحبيل"], a:0},
+  {q:"حمل رسالة النبي ﷺ إلى النجاشي الصحابي:", o:["حاطب بن أبي بلتعة","دحية الكلبي","عمرو بن أمية الضمري","عبد الله بن حذافة"], a:2},
+  {q:"أسلم النجاشي على يد:", o:["عمرو بن العاص","جعفر بن أبي طالب","العلاء بن الحضرمي","الحارث بن عمير"], a:1},
+  {q:"«كسرى» لقب لملك:", o:["الروم","الحبشة","القبط","الفرس"], a:3},
+  {q:"الصحابي الذي أُرسل إلى كسرى هو:", o:["عبد الله بن حذافة السهمي","دحية الكلبي","حاطب بن أبي بلتعة","العلاء بن الحضرمي"], a:0},
+  {q:"«المقوقس» لقب لملك:", o:["الفرس","القبط","الحبشة","الروم"], a:1},
+  {q:"الصحابي الذي أُرسل إلى المقوقس هو:", o:["دحية الكلبي","عمرو بن العاص","حاطب بن أبي بلتعة","عمرو الضمري"], a:2},
+  {q:"الصحابي الذي أُرسل إلى هرقل هو:", o:["دحية الكلبي","حاطب بن أبي بلتعة","عبد الله بن حذافة","العلاء بن الحضرمي"], a:0},
+  {q:"هرقل هو عظيم:", o:["الفرس","القبط","الروم","الحبشة"], a:2},
+  {q:"الذي سأله هرقل عن النبي ﷺ هو:", o:["أبو جهل","أبو سفيان","أبو لهب","عمرو بن العاص"], a:1},
+  {q:"المجوس هم:", o:["أهل الكتاب","من يعبدون النار","أتباع المقوقس","أهل البحرين"], a:1},
+  {q:"عامل كسرى على اليمن اسمه:", o:["باذان","جيفر","المنذر","شرحبيل"], a:0},
+  {q:"أُرسل الحارث بن عمير الأزدي بالرسالة إلى:", o:["أمير بُصرى","كسرى","المقوقس","النجاشي"], a:0},
+  {q:"الذي قتل الحارث بن عمير هو:", o:["باذان","شرحبيل بن عمرو الغساني","كسرى","هرقل"], a:1},
+  {q:"يُعدّ مقتل الحارث من أسباب:", o:["غزوة حنين","معركة مؤتة","غزوة خيبر","صلح الحديبية"], a:1},
+  {q:"صُنع خاتم النبي ﷺ من:", o:["الذهب","الفضة","النحاس","الحديد"], a:1},
+  {q:"النقش على خاتم النبي ﷺ:", o:["لا إله إلا الله","محمد رسول الله","الله أكبر","بسم الله"], a:1},
+  {q:"الملك الذي مزّق رسالة النبي ﷺ هو:", o:["النجاشي","هرقل","كسرى","المقوقس"], a:2},
+  {q:"الملك الذي أكرم حامل الرسالة وأرسل هدية ولم يُسلم هو:", o:["كسرى","المقوقس","النجاشي","المنذر بن ساوى"], a:1},
+  {q:"خاطب النبي ﷺ ملوك الجزيرة العربية بأسمائهم دون ألقاب لأنهم:", o:["أعداء","لا يملكون الإرادة السياسية ولم يكونوا ملوكاً حقيقيين","من أهل الكتاب","من الفرس"], a:1},
+  {q:"وُصف ملك البحرين بأنه:", o:["متكبر","عاقل متزن","ظالم","جاهل"], a:1},
+  {q:"الذين تشابهت رسائل النبي ﷺ إليهم:", o:["النجاشي وهرقل والمقوقس","كسرى وهرقل","المنذر وجيفر","باذان وكسرى"], a:0},
+  {q:"وُصف دحية الكلبي بأنه:", o:["حسن المظهر وفارس ماهر","كبير السن","أعمى","تاجر"], a:0},
+  {q:"اختار النبي ﷺ سفراءه:", o:["عشوائياً","عن دراية ومعرفة بلغة القوم وعاداتهم","من الأطفال","من غير الصحابة"], a:1},
+  {q:"اشتراك الرسائل في تذكير الزعماء بأن الإسلام:", o:["سيبلغ كل الأرض","محصور في مكة","للعرب فقط","لن ينتشر"], a:0},
+  {q:"بعث الله كل نبي إلى قومه خاصة وبعث سيدنا محمداً ﷺ إلى الناس كافة.", o:["صح","خطأ"], a:0},
+  {q:"كانت أول رسائل النبي ﷺ إلى الملوك قبل الهجرة.", o:["صح","خطأ"], a:1},
+  {q:"أرسل النبي ﷺ عشرات الرسائل إلى الملوك والزعماء.", o:["صح","خطأ"], a:0},
+  {q:"استجاب جيفر وعبد ابنا الجلندي وأعلنا إسلامهما.", o:["صح","خطأ"], a:0},
+  {q:"خاطب النبي ﷺ ملوك الجزيرة العربية بألقابهم.", o:["صح","خطأ"], a:1},
+  {q:"معظم ملوك الجزيرة العربية كانوا عمّالاً للفرس أو الروم.", o:["صح","خطأ"], a:0},
+  {q:"عرض النبي ﷺ على الملوك إبقاءهم على مُلكهم إن أسلموا.", o:["صح","خطأ"], a:0},
+  {q:"ردّ النجاشي على رسالة النبي ﷺ بأنه أسلم.", o:["صح","خطأ"], a:0},
+  {q:"مزّق كسرى رسالة النبي ﷺ فدعا عليه النبي ﷺ بأن يُمزّق الله مُلكه.", o:["صح","خطأ"], a:0},
+  {q:"أسلم باذان وانتشر الإسلام في اليمن.", o:["صح","خطأ"], a:0},
+  {q:"أسلم هرقل بعد قراءة الرسالة.", o:["صح","خطأ"], a:1},
+  {q:"استقصى هرقل أخبار النبي ﷺ فسأل أبا سفيان.", o:["صح","خطأ"], a:0},
+  {q:"أسلم المقوقس وبعث هدية إلى النبي ﷺ.", o:["صح","خطأ"], a:1},
+  {q:"الحارث بن عمير الأزدي أول رسول يُقتل في الإسلام.", o:["صح","خطأ"], a:0},
+  {q:"كان كسرى من أهل الكتاب.", o:["صح","خطأ"], a:1},
+  {q:"قال تعالى: ﴿وما أرسلناك إلا ........ للناس بشيراً ونذيراً﴾:", o:["خاصة","كافة","قوماً","العرب"], a:1},
+  {q:"اتخذ النبي ﷺ خاتماً من ........ ليختم به خطاباته:", o:["ذهب","فضة","حديد","نحاس"], a:1},
+  {q:"بعث النبي ﷺ ........ بن العاص إلى جيفر وعبد:", o:["عمرو","خالد","عبد الله","حاطب"], a:0},
+  {q:"كان النجاشي ملك ........:", o:["الفرس","الروم","الحبشة","القبط"], a:2},
+  {q:"بعث النبي ﷺ حاطب بن أبي بلتعة إلى ........ عظيم القبط:", o:["هرقل","كسرى","المقوقس","النجاشي"], a:2},
+  {q:"قال النبي ﷺ لهرقل: «أسلِم يؤتِك الله أجرك ........»:", o:["مرة","مرتين","ثلاثاً","أضعافاً"], a:1},
+  {q:"أرسل النبي ﷺ ........ بن حذافة السهمي إلى كسرى:", o:["عبد الله","عمرو","دحية","حاطب"], a:0},
+  {q:"من أسباب معركة ........ مقتل الحارث بن عمير:", o:["بدر","أحد","مؤتة","حنين"], a:2},
+  {q:"علّلي: عرض النبي ﷺ على الملوك إبقاءهم على مُلكهم إن أسلموا:", o:["ليستولي على مناصبهم","خوفاً منهم","لأنه يعلم أن ذلك قد يساعد على إسلامهم وإسلام من معهم","لأنهم طلبوا ذلك"], a:2},
+  {q:"علّلي: أُرسل دحية الكلبي إلى هرقل:", o:["لأنه من أهل الشام فقط","لأنه تاجر","لأنه عالم بالروم ومتحدث بلغتهم حسن المظهر وفارس ماهر","لأنه أكبر الصحابة"], a:2},
+  {q:"علّلي: تشابهت رسائل النبي ﷺ إلى النجاشي وهرقل والمقوقس:", o:["لأنهم من المجوس","لأنهم عبّاد نار","لأنهم من العرب","لأنهم من أهل الكتاب أصحاب اعتقاد واحد"], a:3},
+  {q:"علّلي: عدم إسلام هرقل بالرغم من تأثره برسالة النبي ﷺ:", o:["لأنه كره الرسالة","لأنه لم يفهمها","لأنه خاف على مُلكه","لأنه قتل الرسول"], a:2},
+  {q:"المقارنة بين موقف ملك البحرين وموقف المقوقس:", o:["كلاهما أسلم","كلاهما رفض","ملك البحرين أسلم والمقوقس أكرم حامل الرسالة ولم يُسلم","المقوقس أسلم وملك البحرين لم يُسلم"], a:2},
+  {q:"المقارنة بين موقف النجاشي وموقف كسرى:", o:["كلاهما مزّق الرسالة","النجاشي أسلم وكسرى مزّق الرسالة","كسرى أسلم والنجاشي مزّق الرسالة","كلاهما أسلم"], a:1},
+  {q:"المقارنة بين موقف هرقل وموقف النجاشي:", o:["هرقل أسلم والنجاشي لم يُسلم","كلاهما لم يُسلم","كلاهما أسلم","النجاشي أسلم وهرقل تأثر لكنه خاف على مُلكه فلم يُسلم"], a:3}
+];
+
+const TOTAL_QUESTIONS = 30;
+const LETTERS = ["أ","ب","ج","د"];
+const CHARACTER_IMAGES = [];
+for (let i = 1; i <= 20; i++) { CHARACTER_IMAGES.push(i + ".png"); }
+
+let questions = [], index = 0, correctCount = 0, totalCount = 0, cheatCount = 0;
+let locked = false, studentNames = "", selectedCharImg = "";
+
+const nameScreen = document.getElementById("nameScreen");
+const charScreen = document.getElementById("charScreen");
+const quizScreen = document.getElementById("quizScreen");
+const resultScreen = document.getElementById("resultScreen");
+const charsGrid = document.getElementById("charsGrid");
+const startQuizBtn = document.getElementById("startQuizBtn");
+const optionsContainer = document.getElementById("options");
+
+function shuffle(arr){ const a = arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; }
+
+document.getElementById("toCharBtn").onclick = function() {
+  const names = document.getElementById("pairName").value.trim();
+  
+  if(!names) { 
+    alert("الرجاء كتابة الاسم الثنائي للبدء."); 
+    return; 
+  }
+  studentNames = names;
+
+  charsGrid.innerHTML = "";
+  CHARACTER_IMAGES.forEach(function(imgUrl, i) {
+    const btn = document.createElement("button");
+    btn.type = "button"; btn.className = "char-opt";
+    btn.innerHTML = '<img src="' + imgUrl + '">';
+    btn.onclick = function() {
+      document.querySelectorAll(".char-opt").forEach(el => el.classList.remove("selected"));
+      btn.classList.add("selected");
+      selectedCharImg = imgUrl;
+      startQuizBtn.style.opacity = "1"; startQuizBtn.style.pointerEvents = "auto";
+    };
+    charsGrid.appendChild(btn);
+  });
+  nameScreen.classList.remove("active"); charScreen.classList.add("active");
+};
+
+startQuizBtn.onclick = function() {
+  if(!selectedCharImg) return alert("الرجاء اختيار شخصية أولاً.");
+  const picked = shuffle(BANK).slice(0, TOTAL_QUESTIONS);
+  questions = picked.map(function(q) {
+    const pairs = q.o.map(function(text, idx) { return {text: text, isCorrect: idx === q.a}; });
+    const shuffled = shuffle(pairs);
+    return { q: q.q, options: shuffled, correctIndex: shuffled.findIndex(function(p) { return p.isCorrect; }) };
+  });
+  index = 0; correctCount = 0; totalCount = 0; cheatCount = 0;
+  document.getElementById("headerImg").src = selectedCharImg;
+  document.getElementById("headerNames").textContent = studentNames;
+  document.getElementById("correctCount").textContent = 0;
+  document.getElementById("totalCount").textContent = 0;
+  charScreen.classList.remove("active"); quizScreen.classList.add("active");
+  renderQuestion();
+};
+
+function renderQuestion(){
+  if(index >= questions.length){ endQuiz(); return; }
+  const q = questions[index]; locked = false;
+  document.getElementById("qText").textContent = q.q;
+  document.getElementById("qNum").textContent = index + 1;
+  document.getElementById("qType").textContent = q.options.length === 2 ? "صح / خطأ" : "اختيار من متعدد";
+  document.getElementById("qProgress").textContent = "السؤال " + (index + 1) + " من " + questions.length;
+  optionsContainer.innerHTML = "";
+  q.options.forEach(function(opt, i) {
+    const btn = document.createElement("button");
+    btn.className = "opt"; btn.type = "button";
+    btn.innerHTML = '<span class="letter">' + (q.options.length === 2 ? (i===0?"✓":"✗") : LETTERS[i]) + '</span><span>' + opt.text + '</span>';
+    btn.onclick = function() { handleAnswer(i, btn); };
+    optionsContainer.appendChild(btn);
+  });
+}
+
+function handleAnswer(selected, btn){
+  if(locked) return; locked = true;
+  const buttons = optionsContainer.querySelectorAll(".opt");
+  buttons.forEach(b => b.disabled = true);
+  totalCount++;
+  
+  if(selected === questions[index].correctIndex){
+    btn.classList.add("correct"); 
+    correctCount++; 
+    launchEffects(true);
+    setTimeout(nextQuestion, 1400);
+  } else {
+    btn.classList.add("wrong");
+    buttons[questions[index].correctIndex].classList.add("correct");
+    
+    launchEffects(false);
+    setTimeout(nextQuestion, 1600);
+  }
+  document.getElementById("correctCount").textContent = correctCount;
+  document.getElementById("totalCount").textContent = totalCount;
+}
+
+function nextQuestion(){ index++; renderQuestion(); }
+
+function launchEffects(isCorrect){
+  const layer = document.getElementById("effectsLayer");
+  const emojis = isCorrect ? ["🌹","🌸","💐","🌷","🌺"] : ["❌","❌","❌","⛔","🚫"];
+  const count = isCorrect ? 22 : 30;
+  
+  for(let i=0;i<count;i++){
+    const f = document.createElement("div");
+    f.className = "effect-item"; 
+    f.textContent = emojis[Math.floor(Math.random()*emojis.length)];
+    f.style.left = Math.random()*100 + "vw";
+    f.style.fontSize = isCorrect ? (18 + Math.random()*22) + "px" : (20 + Math.random()*30) + "px";
+    f.style.animationDuration = (2.2 + Math.random()*1.8) + "s";
+    f.style.animationDelay = (Math.random()*0.5) + "s";
+    layer.appendChild(f); 
+    setTimeout(() => f.remove(), 4200);
+  }
+}
+
+function endQuiz(){
+  quizScreen.classList.remove("active"); resultScreen.classList.add("active");
+  document.getElementById("resultImg").src = selectedCharImg;
+  document.getElementById("resultNames").textContent = studentNames;
+  document.getElementById("finalScore").textContent = correctCount + " / " + questions.length;
+
+  const record = { 
+    names: studentNames, 
+    img: selectedCharImg, 
+    score: correctCount + "/" + questions.length, 
+    cheats: cheatCount, 
+    time: new Date().toISOString() 
+  };
+  
+  let history = JSON.parse(localStorage.getItem("quiz_results")) || [];
+  history.push(record);
+  localStorage.setItem("quiz_results", JSON.stringify(history));
+}
+
+document.addEventListener("visibilitychange", function() {
+  if(document.hidden && quizScreen.classList.contains("active")) { 
+    cheatCount++; 
+  }
+});
+</script>
+</body>
+</html>
